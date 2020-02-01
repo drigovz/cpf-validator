@@ -36,11 +36,61 @@ export default class ValidarCpf {
         // ou seja, se não retornou um null do match acima 
         return (matchCpf && matchCpf[0] === cpf);
     }
+  
+  /**
+    * @description - validar composição de dígitos do CPF
+    * @see - 'https://www.geradorcpf.com'
+ */
+  validateCompositionCpf(cpf) {
+    const cpfLimpo = this.cleanCPF(cpf);
+
+    if (cpfLimpo === '') return false;
+
+    // Elimina CPFs invalidos conhecidos	
+    if (cpfLimpo.length != 11 ||
+        cpfLimpo == "00000000000" ||
+        cpfLimpo == "11111111111" ||
+        cpfLimpo == "22222222222" ||
+        cpfLimpo == "33333333333" ||
+        cpfLimpo == "44444444444" ||
+        cpfLimpo == "55555555555" ||
+        cpfLimpo == "66666666666" ||
+        cpfLimpo == "77777777777" ||
+        cpfLimpo == "88888888888" ||
+        cpfLimpo == "99999999999") return false;
+
+    // Valida 1° digito	
+    let add = 0;
+    for (let i = 0; i < 9; i++)
+      add += parseInt(cpfLimpo.charAt(i)) * (10 - i);
+    let rev = 11 - (add % 11);
+
+    if (rev == 10 || rev == 11)
+      rev = 0;
+
+    if (rev != parseInt(cpfLimpo.charAt(9)))
+      return false;
+
+    // Valida 2° digito	
+    let addSecond = 0;
+    for (let item = 0; item < 10; item++)
+      addSecond += parseInt(cpfLimpo.charAt(item)) * (11 - item);
+
+    let revSecond = 11 - (addSecond % 11);
+    if (revSecond == 10 || revSecond == 11)
+      revSecond = 0;
+
+    if (revSecond != parseInt(cpfLimpo.charAt(10)))
+      return false;
+
+    return true;
+  }
 
     // método que vai validar o cpf no evento change / validar na mudança 
     validOnChange(cpfElement) {
         // verificamos se do retorno da validação do cpf veio um valor verdadeiro/true 
-        if (this.validationCpf(cpfElement.value)) {
+        //if (this.validationCpf(cpfElement.value)) {
+      if (this.validateCompositionCpf(cpfElement.value)) {
             // a primeira coisa que faremos é exibir no input o cpf formatado 
             cpfElement.value = this.formatCpf(cpfElement.value);
 
